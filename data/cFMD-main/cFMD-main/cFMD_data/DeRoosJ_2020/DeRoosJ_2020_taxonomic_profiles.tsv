@@ -1,0 +1,9 @@
+sample	DeRoosJ_2020__B13M	DeRoosJ_2020__B24M	DeRoosJ_2020__B3D	DeRoosJ_2020__B3M	DeRoosJ_2020__B3W	DeRoosJ_2020__B9M
+k__Bacteria|p__Pseudomonadota|c__Gammaproteobacteria|o__Enterobacterales|f__Enterobacteriaceae|g__Klebsiella|s__Klebsiella_grimontii|t__SGB10120	0.0	0.0	0.04862	0.0	0.0	0.0
+k__Bacteria|p__Pseudomonadota|c__Gammaproteobacteria|o__Enterobacterales|f__Enterobacteriaceae|g__Klebsiella|s__Klebsiella_variicola|t__SGB10114	0.0	0.0	1.48668	0.0	0.54035	0.0
+k__Eukaryota|p__Ascomycota|c__Saccharomycetes|o__Saccharomycetales|f__Saccharomycetaceae|g__Saccharomyces|s__Saccharomyces_cerevisiae|t__EUK4932	4.08836	0.0	98.4647	4.79926	99.45965	18.64424
+k__Bacteria|p__Firmicutes|c__Bacilli|o__Lactobacillales|f__Lactobacillaceae|g__Lentilactobacillus|s__Lentilactobacillus_buchneri|t__SGB7220	0.0	5.37332	0.0	0.0	0.0	0.0
+k__Bacteria|p__Pseudomonadota|c__Alphaproteobacteria|o__Acetobacterales|f__Acetobacteraceae|g__Acetobacter|s__Acetobacter_lambici|t__SGB89217	5.06344	2.39705	0.0	46.44218	0.0	8.97312
+k__Bacteria|p__Pseudomonadota|c__Alphaproteobacteria|o__Acetobacterales|f__Acetobacteraceae|g__Acetobacter|s__Acetobacter_ascendens|t__SGB1195	67.81713	1.43363	0.0	48.33429	0.0	12.66604
+k__Bacteria|p__Firmicutes|c__Bacilli|o__Lactobacillales|f__Lactobacillaceae|g__Pediococcus|s__Pediococcus_damnosus|t__SGB7176	20.61665	90.796	0.0	0.0	0.0	55.1374
+k__Eukaryota|p__Ascomycota|c__Saccharomycetes|o__Saccharomycetales|f__Pichiaceae|g__Pichia|s__Pichia_membranifaciens_group_1|t__EUK4926_1	2.41442	0.0	0.0	0.42427	0.0	4.57921

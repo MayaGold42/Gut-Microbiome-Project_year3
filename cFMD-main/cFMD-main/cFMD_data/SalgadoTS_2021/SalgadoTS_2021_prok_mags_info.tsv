@@ -1,5 +1,0 @@
-MAG_id	dataset_id	sample_id	SGB_assignment	SGB_id	unknown	assigned_taxonomy_level	superkingdom	phylum	class	order	family	genus	species	genome_size	n_contigs	N50	completeness	contamination	GC_content
-SalgadoTS_2021__SRR13801804__bin.2	SalgadoTS_2021	SRR13801804	assigned	SGB7046	kSGB	Species	Bacteria	Bacillota	Bacilli	Lactobacillales	Lactobacillaceae	Lactobacillus	Lactobacillus_kefiranofaciens	2031193.0	83.0	42606.0	94.9	0.27	0.37
-SalgadoTS_2021__SRR13801804__bin.3	SalgadoTS_2021	SRR13801804	assigned	SGB7221	kSGB	Species	Bacteria	Bacillota	Bacilli	Lactobacillales	Lactobacillaceae	Lentilactobacillus	Lentilactobacillus_kefiri	2214321.0	55.0	62782.0	99.82	0.09	0.42
-SalgadoTS_2021__SRR13801805__bin.2	SalgadoTS_2021	SRR13801805	assigned	SGB7221	kSGB	Species	Bacteria	Bacillota	Bacilli	Lactobacillales	Lactobacillaceae	Lentilactobacillus	Lentilactobacillus_kefiri	2187849.0	50.0	66690.0	99.79	0.09	0.42
-SalgadoTS_2021__SRR13801805__bin.3	SalgadoTS_2021	SRR13801805	assigned	SGB7046	kSGB	Species	Bacteria	Bacillota	Bacilli	Lactobacillales	Lactobacillaceae	Lactobacillus	Lactobacillus_kefiranofaciens	1527340.0	58.0	49098.0	84.5	0.0	0.38
