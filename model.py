@@ -11,27 +11,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
-# #Create dummy data
-# np.random.seed(42)
-# n_samples = 500
 
-# df_fme = pd.DataFrame({
-#     'UserName': np.repeat([f'Subject_{i}' for i in range(1, 26)], 20),
-#     'KCAL': np.random.normal(2000, 400, n_samples),                 #Calories
-#     'FIBE': np.random.normal(25, 10, n_samples),                    #Fiber
-#     'CARB': np.random.normal(250, 50, n_samples),                   #Carbs
-#     'TFAT': np.random.normal(70, 20, n_samples),                    #Total Fat
-#     'Dietary_Diversity': np.random.uniform(10, 30, n_samples),      #Dietary Diversity
-#     'FME_Score': np.random.normal(500, 150, n_samples)              #FME Score
-# })
 # Load data
 df_fme = pd.read_csv("fme_statistical_dataset.csv", index_col=0)
 print(f"Loaded dataset: {df_fme.shape[0]} samples, {df_fme.shape[1]} columns")
 print(f"Participants: {df_fme['participant_id'].nunique()}")
 
-#Create target variable (binary classification)
-# prob = (df_fme['FIBE'] * 0.4 + df_fme['FME_Score'] * 0.1) / 100
-# df_fme['High_Diversity_Class'] = np.where(prob + np.random.normal(0, 0.2, n_samples) > 0.5, 1, 0)
+
 
 print("=== Sample of  Data ===")
 print(df_fme.head())
@@ -112,7 +98,7 @@ for name, model in models.items():
 
 print(f"\n Best Model: {best_model_name} (Mean AUC = {best_auc:.3f})")
 
-#Feature importance for best model
+#Feature importance for best modelv
 if best_model_name == "Logistic Regression":
     importances = np.abs(best_model_obj.coef_[0])
     title       = "Feature Importance (Logistic Regression — Absolute Coefficients)"
