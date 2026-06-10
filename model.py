@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import GroupKFold  # שונה מ-train_test_split
+from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 
@@ -11,9 +11,17 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
+#Regression imports
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.base import clone
 
-# Load data
-df_fme = pd.read_csv("fme_statistical_dataset.csv", index_col=0)
+from config import DATA_DIR
+
+#Load data
+df_fme = pd.read_csv(DATA_DIR / "fme_statistical_dataset.csv", index_col=0)
 print(f"Loaded dataset: {df_fme.shape[0]} samples, {df_fme.shape[1]} columns")
 print(f"Participants: {df_fme['participant_id'].nunique()}")
 
@@ -22,17 +30,17 @@ print(f"Participants: {df_fme['participant_id'].nunique()}")
 print("=== Sample of  Data ===")
 print(df_fme.head())
 
-# Turn shannon diversity from contiues to binary
+#Turn shannon diversity from contiues to binary
 median_shannon = df_fme["shannon_diversity"].median()
 df_fme["High_Diversity_Class"] = (df_fme["shannon_diversity"] > median_shannon).astype(int)
 print(f"\nTarget distribution (High=1 / Low=0):")
 print(df_fme["High_Diversity_Class"].value_counts())
 
-# Features
+#Features
 feature_cols = ["fme_score_daily", "KCAL", "FIBE", "CARB", "TFAT", "Age", "BMI"]
 feature_cols = [f for f in feature_cols if f in df_fme.columns]
 
-# Drop rows with missing values in features or target
+#Drop rows with missing values in features or target
 df_fme_clean = df_fme[feature_cols + ["High_Diversity_Class", "participant_id"]].dropna()
 
 #Prepare data for modeling
@@ -117,6 +125,6 @@ plt.title(title, fontsize=14)
 plt.xlabel(xlabel, fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.tight_layout()
-plt.savefig("feature_importance.png", dpi=150)  # ← שמירה לפני show
+plt.savefig(DATA_DIR / "feature_importance.png", dpi=150)      #Save before showings
 plt.show()
-print("Plot saved: feature_importance.png")
+print(f"Plot saved: {DATA_DIR / 'feature_importance.png'}")
