@@ -1,0 +1,21 @@
+metric,model_type,n_samples,fme_coef,fme_p_value,significance
+shannon_diversity,Correlation,475,-0.040577321439553546,0.37756292274653996,not significant
+richness,Correlation,475,0.023375867100168958,0.6113184665074762,not significant
+simpson_diversity,Correlation,475,-0.0407238984988268,0.3758408224447178,not significant
+inverse_simpson,Correlation,475,-0.048480352161123154,0.2916810701925573,not significant
+pielou_evenness,Correlation,475,-0.04387187915299444,0.34003019084801145,not significant
+shannon_diversity,OLS: Age + BMI,475,-0.00021427327900107828,0.5154357429657941,not significant
+richness,OLS: Age + BMI,475,0.004184527582827075,0.661442714941819,not significant
+simpson_diversity,OLS: Age + BMI,475,-4.114687489738676e-05,0.49608511947778744,not significant
+inverse_simpson,OLS: Age + BMI,475,-0.0020883929340167256,0.46548742785814223,not significant
+pielou_evenness,OLS: Age + BMI,475,-4.2388626191322036e-05,0.47630503632817683,not significant
+shannon_diversity,OLS: Age + BMI + nutrition,475,2.5576689705786082e-05,0.9498414820036144,not significant
+richness,OLS: Age + BMI + nutrition,475,0.022270419548496397,0.05956967414601317,trend
+simpson_diversity,OLS: Age + BMI + nutrition,475,-1.9466991377691548e-05,0.7941031703778471,not significant
+inverse_simpson,OLS: Age + BMI + nutrition,475,0.00042073179537633536,0.9054030879706594,not significant
+pielou_evenness,OLS: Age + BMI + nutrition,475,-5.4392255386525665e-06,0.9409685216321845,not significant
+shannon_diversity,MixedLM: Age + BMI + nutrition + participant,475,-0.0004488722448603032,0.0510346689307456,trend
+richness,MixedLM: Age + BMI + nutrition + participant,475,0.007210187027151464,0.47673132518867445,not significant
+simpson_diversity,MixedLM: Age + BMI + nutrition + participant,475,-5.274547631121475e-05,0.27446120027781995,not significant
+inverse_simpson,MixedLM: Age + BMI + nutrition + participant,475,-0.0010005075262987482,0.6791544642597203,not significant
+pielou_evenness,MixedLM: Age + BMI + nutrition + participant,475,-8.819085608503342e-05,0.03918551734981446,significant
