@@ -1,21 +1,76 @@
-metric,model_type,n_samples,fme_coef,fme_p_value,significance
-shannon_diversity,Correlation,475,-0.040577321439553546,0.37756292274653996,not significant
-richness,Correlation,475,0.023375867100168958,0.6113184665074762,not significant
-simpson_diversity,Correlation,475,-0.0407238984988268,0.3758408224447178,not significant
-inverse_simpson,Correlation,475,-0.048480352161123154,0.2916810701925573,not significant
-pielou_evenness,Correlation,475,-0.04387187915299444,0.34003019084801145,not significant
-shannon_diversity,OLS: Age + BMI,475,-0.00021427327900107828,0.5154357429657941,not significant
-richness,OLS: Age + BMI,475,0.004184527582827075,0.661442714941819,not significant
-simpson_diversity,OLS: Age + BMI,475,-4.114687489738676e-05,0.49608511947778744,not significant
-inverse_simpson,OLS: Age + BMI,475,-0.0020883929340167256,0.46548742785814223,not significant
-pielou_evenness,OLS: Age + BMI,475,-4.2388626191322036e-05,0.47630503632817683,not significant
-shannon_diversity,OLS: Age + BMI + nutrition,475,2.5576689705786082e-05,0.9498414820036144,not significant
-richness,OLS: Age + BMI + nutrition,475,0.022270419548496397,0.05956967414601317,trend
-simpson_diversity,OLS: Age + BMI + nutrition,475,-1.9466991377691548e-05,0.7941031703778471,not significant
-inverse_simpson,OLS: Age + BMI + nutrition,475,0.00042073179537633536,0.9054030879706594,not significant
-pielou_evenness,OLS: Age + BMI + nutrition,475,-5.4392255386525665e-06,0.9409685216321845,not significant
-shannon_diversity,MixedLM: Age + BMI + nutrition + participant,475,-0.0004488722448603032,0.0510346689307456,trend
-richness,MixedLM: Age + BMI + nutrition + participant,475,0.007210187027151464,0.47673132518867445,not significant
-simpson_diversity,MixedLM: Age + BMI + nutrition + participant,475,-5.274547631121475e-05,0.27446120027781995,not significant
-inverse_simpson,MixedLM: Age + BMI + nutrition + participant,475,-0.0010005075262987482,0.6791544642597203,not significant
-pielou_evenness,MixedLM: Age + BMI + nutrition + participant,475,-8.819085608503342e-05,0.03918551734981446,significant
+metric,model_type,fme_feature,n_samples,fme_coef,fme_p_value,significance
+inverse_simpson,Correlation,fme_score_daily,475,-0.048480352161123154,0.2916810701925573,not significant
+inverse_simpson,Extended correlation,fme_lag1,441,-0.06414123483191565,0.17877776745397186,not significant
+inverse_simpson,Extended correlation,fme_lag2,407,-0.06724333438420034,0.17575431416705745,not significant
+inverse_simpson,Extended correlation,fme_participant_mean,475,-0.0649944710609154,0.15727819885560507,not significant
+inverse_simpson,Extended correlation,fme_score_daily,475,-0.048480352161123154,0.2916810701925573,not significant
+inverse_simpson,Extended correlation,fme_weighted_3day,475,-0.06766056452798418,0.1409047319190596,not significant
+inverse_simpson,Extended correlation,fme_within_person,475,-0.005626376387328431,0.9026599176244752,not significant
+inverse_simpson,MixedLM: Age + BMI + nutrition + participant,fme_score_daily,475,-0.0010005075262987482,0.6791544642597203,not significant
+inverse_simpson,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_participant_mean,475,-0.005160447496240651,0.7407258658317931,not significant
+inverse_simpson,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_within_person,475,-0.0009398862083631315,0.6989400961943995,not significant
+inverse_simpson,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag1,407,-0.0009584812454242772,0.6738543614233006,not significant
+inverse_simpson,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag2,407,-0.00051510500964436,0.8231873262309366,not significant
+inverse_simpson,MixedLM: weighted 3-day FME + Age + BMI + nutrition + participant,fme_weighted_3day,475,-0.0020467999746698906,0.5639608794394446,not significant
+inverse_simpson,OLS: Age + BMI,fme_score_daily,475,-0.0020883929340167256,0.46548742785814223,not significant
+inverse_simpson,OLS: Age + BMI + nutrition,fme_score_daily,475,0.00042073179537633536,0.9054030879706594,not significant
+pielou_evenness,Correlation,fme_score_daily,475,-0.04387187915299444,0.34003019084801145,not significant
+pielou_evenness,Extended correlation,fme_lag1,441,-0.022657950447191474,0.6351238398304198,not significant
+pielou_evenness,Extended correlation,fme_lag2,407,-0.05824216471496368,0.24104730794124818,not significant
+pielou_evenness,Extended correlation,fme_participant_mean,475,-0.019755380733140707,0.6675841083963746,not significant
+pielou_evenness,Extended correlation,fme_score_daily,475,-0.04387187915299444,0.34003019084801145,not significant
+pielou_evenness,Extended correlation,fme_weighted_3day,475,-0.046130674902679976,0.315725809324314,not significant
+pielou_evenness,Extended correlation,fme_within_person,475,-0.04158219965861676,0.36585416502873097,not significant
+pielou_evenness,MixedLM: Age + BMI + nutrition + participant,fme_score_daily,475,-8.819085608503342e-05,0.03918551734981446,significant
+pielou_evenness,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_participant_mean,475,-3.841512482922195e-05,0.9081921178947319,not significant
+pielou_evenness,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_within_person,475,-8.874383882817879e-05,0.03857415756119167,significant
+pielou_evenness,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag1,407,9.266621671125845e-07,0.9821147928153816,not significant
+pielou_evenness,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag2,407,-6.228569156287843e-05,0.13667317695779022,not significant
+pielou_evenness,MixedLM: weighted 3-day FME + Age + BMI + nutrition + participant,fme_weighted_3day,475,-0.00012414609013636005,0.048704094084840874,significant
+pielou_evenness,OLS: Age + BMI,fme_score_daily,475,-4.2388626191322036e-05,0.47630503632817683,not significant
+pielou_evenness,OLS: Age + BMI + nutrition,fme_score_daily,475,-5.4392255386525665e-06,0.9409685216321845,not significant
+richness,Correlation,fme_score_daily,475,0.023375867100168958,0.6113184665074762,not significant
+richness,Extended correlation,fme_lag1,441,-0.0017122226304854275,0.9713982564045405,not significant
+richness,Extended correlation,fme_lag2,407,-0.049860505235283,0.3156542378774613,not significant
+richness,Extended correlation,fme_participant_mean,475,-0.008148957574893218,0.8594004557613674,not significant
+richness,Extended correlation,fme_score_daily,475,0.023375867100168958,0.6113184665074762,not significant
+richness,Extended correlation,fme_weighted_3day,475,0.01016007609416476,0.8252045596714824,not significant
+richness,Extended correlation,fme_within_person,475,0.03960212704132805,0.38914325304327163,not significant
+richness,MixedLM: Age + BMI + nutrition + participant,fme_score_daily,475,0.007210187027151464,0.47673132518867445,not significant
+richness,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_participant_mean,475,-0.014485951616275392,0.7388744122964113,not significant
+richness,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_within_person,475,0.007947347869188328,0.4379342515586303,not significant
+richness,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag1,407,0.007764725380765744,0.423326897083651,not significant
+richness,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag2,407,-0.01111235735482185,0.2569680206333149,not significant
+richness,MixedLM: weighted 3-day FME + Age + BMI + nutrition + participant,fme_weighted_3day,475,0.008791367098381613,0.5485224263282253,not significant
+richness,OLS: Age + BMI,fme_score_daily,475,0.004184527582827075,0.661442714941819,not significant
+richness,OLS: Age + BMI + nutrition,fme_score_daily,475,0.022270419548496397,0.05956967414601317,trend
+shannon_diversity,Correlation,fme_score_daily,475,-0.040577321439553546,0.37756292274653996,not significant
+shannon_diversity,Extended correlation,fme_lag1,441,-0.02265837457108263,0.6351175056896068,not significant
+shannon_diversity,Extended correlation,fme_lag2,407,-0.05983681043468395,0.2283851724524644,not significant
+shannon_diversity,Extended correlation,fme_participant_mean,475,-0.019970471584972546,0.6641847022135329,not significant
+shannon_diversity,Extended correlation,fme_score_daily,475,-0.040577321439553546,0.37756292274653996,not significant
+shannon_diversity,Extended correlation,fme_weighted_3day,475,-0.04409927566417279,0.33753067467105546,not significant
+shannon_diversity,Extended correlation,fme_within_person,475,-0.03687273170060473,0.42268145934494805,not significant
+shannon_diversity,MixedLM: Age + BMI + nutrition + participant,fme_score_daily,475,-0.0004488722448603032,0.0510346689307456,trend
+shannon_diversity,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_participant_mean,475,-0.00024604821169898133,0.8945759515832536,not significant
+shannon_diversity,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_within_person,475,-0.00045103992969228467,0.05059323656799278,trend
+shannon_diversity,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag1,407,1.9992762504195907e-05,0.9285045220773226,not significant
+shannon_diversity,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag2,407,-0.0003579673023289881,0.11257252169448465,not significant
+shannon_diversity,MixedLM: weighted 3-day FME + Age + BMI + nutrition + participant,fme_weighted_3day,475,-0.0006387110498774938,0.05950642169607523,trend
+shannon_diversity,OLS: Age + BMI,fme_score_daily,475,-0.00021427327900107828,0.5154357429657941,not significant
+shannon_diversity,OLS: Age + BMI + nutrition,fme_score_daily,475,2.5576689705786082e-05,0.9498414820036144,not significant
+simpson_diversity,Correlation,fme_score_daily,475,-0.0407238984988268,0.3758408224447178,not significant
+simpson_diversity,Extended correlation,fme_lag1,441,-0.031889576823996034,0.5041652902551303,not significant
+simpson_diversity,Extended correlation,fme_lag2,407,-0.05885450397887114,0.23612804571962026,not significant
+simpson_diversity,Extended correlation,fme_participant_mean,475,-0.027661614740405044,0.5475752119256363,not significant
+simpson_diversity,Extended correlation,fme_score_daily,475,-0.0407238984988268,0.3758408224447178,not significant
+simpson_diversity,Extended correlation,fme_weighted_3day,475,-0.0450817923368316,0.32686666909504797,not significant
+simpson_diversity,Extended correlation,fme_within_person,475,-0.029888243202785738,0.515803292774654,not significant
+simpson_diversity,MixedLM: Age + BMI + nutrition + participant,fme_score_daily,475,-5.274547631121475e-05,0.27446120027781995,not significant
+simpson_diversity,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_participant_mean,475,-2.258463095487013e-05,0.9447108257428971,not significant
+simpson_diversity,MixedLM: decomposed FME + Age + BMI + nutrition + participant,fme_within_person,475,-5.3173231132665606e-05,0.27261170517381383,not significant
+simpson_diversity,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag1,407,-1.5192530390476227e-05,0.7483301893042897,not significant
+simpson_diversity,MixedLM: lagged FME + Age + BMI + nutrition + participant,fme_lag2,407,-4.414099346440399e-05,0.3570522315562107,not significant
+simpson_diversity,MixedLM: weighted 3-day FME + Age + BMI + nutrition + participant,fme_weighted_3day,475,-9.273238811485271e-05,0.1904060155507279,not significant
+simpson_diversity,OLS: Age + BMI,fme_score_daily,475,-4.114687489738676e-05,0.49608511947778744,not significant
+simpson_diversity,OLS: Age + BMI + nutrition,fme_score_daily,475,-1.9466991377691548e-05,0.7941031703778471,not significant
