@@ -10,6 +10,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from scipy import stats
 import seaborn as sns
+from sklearn.model_selection import GridSearchCV
+
 
 # Part 1 - Import data
 df_merged = pd.read_csv("fme_statistical_dataset.csv", index_col=0)
@@ -81,7 +83,11 @@ df_merged['fme_lag4'] = df_merged.groupby('participant_id')['fme_score_daily'].s
 df_merged['fme_lag5'] = df_merged.groupby('participant_id')['fme_score_daily'].shift(5)
 df_merged['fme_weighted3'] = (0.5 * df_merged['fme_lag1'] +0.3 * df_merged['fme_lag2'] +0.2 * df_merged['fme_lag3'])
 df_merged['fme_weighted5'] = (0.4 * df_merged['fme_lag1'] + 0.3 * df_merged['fme_lag2'] +0.15 * df_merged['fme_lag3'] + 0.1 * df_merged['fme_lag4'] +0.05 * df_merged['fme_lag5'])
+print("data with aitchison and weighted fme")
 print(df_merged.head(10))
+
+print(f"Target std: {df_merged['aitchison_day_dist'].std():.3f}")
+print(f"Target mean: {df_merged['aitchison_day_dist'].mean():.3f}")
 
 # Part 2 - check statistics
 print("Part 2 - Calulate microbiom features")
@@ -135,10 +141,10 @@ for lag_label, fme_col in fme_versions.items():
 # Check results of fme vs Stability
 print("Check results of fme vs Stability")
 # Print results
-print("Print results")
-for lag_type,results in all_results.items():
-    print(f"lag type {lag_type}")
-    print(results)
+# print("Print results")
+# for lag_type,results in all_results.items():
+#     print(f"lag type {lag_type}")
+#     print(results)
 # Find stats on results
 print("Find stats on results")
 for outcome_name, df_res in all_results.items():
@@ -320,14 +326,21 @@ plt.show()
 
 # Models
 print("****Models****")
-
 # General models
 print("General models")
 # All features
 print("General models")
+param_grids = {
+    'Ridge': {'model__alpha': [0.01, 0.1, 1.0, 10.0, 100.0]},
+    'Random Forest': {
+        'model__n_estimators': [100, 200, 300],
+        'model__max_depth': [3, 5, None],
+        'model__min_samples_leaf': [5, 10, 20]
+    },
+    'Linear Regression': {}  # אין פרמטרים לכוונן
+}
 base_features = ['FIBE', 'KCAL', 'CARB', 'TFAT', 'Age', 'BMI']
 target = 'aitchison_day_dist'
-
 gkf = GroupKFold(n_splits=5)
 models = {
     'Linear Regression': Pipeline([('scaler', StandardScaler()), ('model', LinearRegression())]),
@@ -337,6 +350,7 @@ models = {
 
 # Iterate on each FME version
 for lag_label, fme_col in fme_versions.items():
+    results = {}
     features = [fme_col] + base_features
     df_model = df_merged[features + [target, 'participant_id']].dropna()
     X = df_model[features]
@@ -347,14 +361,33 @@ for lag_label, fme_col in fme_versions.items():
 
     # Iterate on models
     for model_name, pipeline in models.items():
+        # Activate model using cross_val_score the result mark is r2
         r2_scores   = cross_val_score(pipeline, X, y, groups=groups, cv=gkf, scoring='r2')
+        # Activate model using cross_val_score the result mark is msr
         rmse_scores = cross_val_score(pipeline, X, y, groups=groups, cv=gkf, scoring='neg_root_mean_squared_error')
         print(f"  [{model_name}] R²={r2_scores.mean():.3f} ± {r2_scores.std():.3f} | RMSE={(-rmse_scores).mean():.3f}")
+        # Take mean r2 of each midel
+        results[model_name] = r2_scores.mean()
+    # For the best model find best hyper parametrs
+    best_model_name = max(results, key=results.get)
+    print(f"Best model: {best_model_name} with R²={results[best_model_name]:.3f}")
+    if best_model_name != 'Linear Regression':
+        best_pipeline = models[best_model_name]
+        grid_search = GridSearchCV(
+            best_pipeline,
+            param_grid=param_grids[best_model_name],
+            cv=GroupKFold(n_splits=5),
+            scoring='r2'
+        )
+        grid_search.fit(X, y, groups=groups)
+        print(f"Best params: {grid_search.best_params_}")
+        print(f"Best R² after tuning: {grid_search.best_score_:.3f}")
 
 # Only fme model
 print(" Only FME")
 # Check all versions of fme
 for lag_label, fme_col in fme_versions.items():
+    results_simple = {}
     features_fme_only = [fme_col]
     # Prepare the data
     df_model_simple = df_merged[features_fme_only + [target, 'participant_id']].dropna()
@@ -371,17 +404,32 @@ for lag_label, fme_col in fme_versions.items():
             ('model', Ridge())
         ])
     }
-
     print(f"Regression: {lag_label} FME only to Aitchison Day Distance")
     #Iterate on models
     for model_name, pipeline in models_simple.items():
-        # Check r2 of the models
+        # Activate model using cross_val_score the result mark is r2
         r2_scores = cross_val_score(pipeline, X_simple, y_simple, groups=groups_simple, cv=gkf, scoring='r2')
-        # Check error of models
+        # Activate model using cross_val_score the result mark is msr
         rmse_scores = cross_val_score(pipeline, X_simple, y_simple, groups=groups_simple, cv=gkf, scoring='neg_root_mean_squared_error')
         print(f"\n[{model_name}]")
         print(f"  Mean R²:   {r2_scores.mean():.3f} ± {r2_scores.std():.3f}")
         print(f"  Mean RMSE: {(-rmse_scores).mean():.3f}")
+        # Take mean r2 of each midel
+        results_simple[model_name] = r2_scores.mean()
+
+    # For the best model find best hyper parametrs
+    best_model_name = max(results_simple, key=results_simple.get)
+    print(f"\nBest model: {best_model_name} with R²={results_simple[best_model_name]:.3f}")
+    if best_model_name == 'Ridge':
+        grid_search = GridSearchCV(
+            Pipeline([('scaler', StandardScaler()), ('model', Ridge())]),
+            param_grid={'model__alpha': [0.01, 0.1, 1.0, 10.0, 100.0]},
+            cv=GroupKFold(n_splits=5),
+            scoring='r2'
+        )
+        grid_search.fit(X_simple, y_simple, groups=groups_simple)
+        print(f"Best alpha: {grid_search.best_params_}")
+        print(f"Best R² after tuning: {grid_search.best_score_:.3f}")
 
 
 # Persenolized models
