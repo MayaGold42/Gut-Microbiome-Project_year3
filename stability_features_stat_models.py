@@ -77,18 +77,20 @@ df_merged = df_merged.join(participant_stability, on='participant_id')
 df_merged['fme_lag1'] = df_merged.groupby('participant_id')['fme_score_daily'].shift(1)
 df_merged['fme_lag2'] = df_merged.groupby('participant_id')['fme_score_daily'].shift(2)
 df_merged['fme_lag3'] = df_merged.groupby('participant_id')['fme_score_daily'].shift(3)
-df_merged['fme_weighted'] = (0.5 * df_merged['fme_lag1'] +0.3 * df_merged['fme_lag2'] +0.2 * df_merged['fme_lag3'])
-
+df_merged['fme_lag4'] = df_merged.groupby('participant_id')['fme_score_daily'].shift(4)
+df_merged['fme_lag5'] = df_merged.groupby('participant_id')['fme_score_daily'].shift(5)
+df_merged['fme_weighted3'] = (0.5 * df_merged['fme_lag1'] +0.3 * df_merged['fme_lag2'] +0.2 * df_merged['fme_lag3'])
+df_merged['fme_weighted5'] = (0.4 * df_merged['fme_lag1'] + 0.3 * df_merged['fme_lag2'] +0.15 * df_merged['fme_lag3'] + 0.1 * df_merged['fme_lag4'] +0.05 * df_merged['fme_lag5'])
 print(df_merged.head(10))
 
 # Part 2 - check statistics
 print("Part 2 - Calulate microbiom features")
-fme_versions = {'same day': 'fme_score_daily','weighted lag': 'fme_weighted'}
+fme_versions = {'same day': 'fme_score_daily','weighted lag3': 'fme_weighted3','weighted lag5': 'fme_weighted5'}
 all_results ={}
 
 # Check  fme vs Stability per sample
 print("Check  fme vs Stability per sample")
-# Check both versions of fme
+# Check all versions of fme
 for lag_label, fme_col in fme_versions.items():
     aitchison_rows = []
     # Iterate on each participant
@@ -113,8 +115,8 @@ for lag_label, fme_col in fme_versions.items():
 
 # Check  fme vs Stability per participant
 print("Check  fme vs Stability per participant")
-# Check both versions of fme
-participant_fme = df_merged.groupby('participant_id')[['fme_score_daily', 'fme_weighted']].mean()
+# Check all versions of fme
+participant_fme = df_merged.groupby('participant_id')[['fme_score_daily', 'fme_weighted3','fme_weighted5']].mean()
 participant_df = participant_fme.join(df_merged.groupby('participant_id')['aitchison_stability'].first())
 # print("participant_df")
 # print(participant_df.head)
@@ -150,42 +152,42 @@ for outcome_name, df_res in all_results.items():
     print(f"  Mean r: {valid_r.mean():.3f} | Median r: {valid_r.median():.3f}")
 
 # Personal FME vs Nutritional Features
-print("Personal FME vs Nutritional Features")
-nutritional_features = ['FIBE', 'KCAL', 'CARB', 'TFAT']
-print(" Within-subject: FME vs Nutritional Features")
+# print("Personal FME vs Nutritional Features")
+# nutritional_features = ['FIBE', 'KCAL', 'CARB', 'TFAT']
+# print(" Within-subject: FME vs Nutritional Features")
 
-# Check both versions of fme
-for lag_label, fme_col in fme_versions.items():
-    print(lag_label)
-    feature_rows = []
-    # Iterate on each feature
-    for feature in nutritional_features:
-        feature_rows = []
-        # Iterate on each subject
-        for subject, group in df_merged.groupby('participant_id'):
-            valid = group[[fme_col, feature]].dropna()
-            if len(valid) < 4:
-                continue
-            r, p = stats.spearmanr(valid[fme_col], valid[feature])
-            if np.isnan(r):
-                continue
-            feature_rows.append({
-                'participant_id': subject,
-                'spearman_r': r,
-                'p_value': p,
-                'significant': p < 0.05
-        })
-        #Check stats on results
-        df_feature = pd.DataFrame(feature_rows)
-        valid_r = df_feature['spearman_r'].dropna()
-        t_stat, p_group = stats.ttest_1samp(valid_r, 0)
+# # Check all versions of fme
+# for lag_label, fme_col in fme_versions.items():
+#     print(lag_label)
+#     feature_rows = []
+#     # Iterate on each feature
+#     for feature in nutritional_features:
+#         feature_rows = []
+#         # Iterate on each subject
+#         for subject, group in df_merged.groupby('participant_id'):
+#             valid = group[[fme_col, feature]].dropna()
+#             if len(valid) < 4:
+#                 continue
+#             r, p = stats.spearmanr(valid[fme_col], valid[feature])
+#             if np.isnan(r):
+#                 continue
+#             feature_rows.append({
+#                 'participant_id': subject,
+#                 'spearman_r': r,
+#                 'p_value': p,
+#                 'significant': p < 0.05
+#         })
+#         #Check stats on results
+#         df_feature = pd.DataFrame(feature_rows)
+#         valid_r = df_feature['spearman_r'].dropna()
+#         t_stat, p_group = stats.ttest_1samp(valid_r, 0)
 
-        print("Print results")
-        print(f"\n{feature}:")
-        print(f"  Positive: {(valid_r > 0).sum()} | Negative: {(valid_r < 0).sum()}")
-        print(f"  Mean r: {valid_r.mean():.3f} | Median r: {valid_r.median():.3f}")
-        print(f"  Significant (p<0.05): {df_feature['significant'].sum()}")
-        print(f"  t-test: t={t_stat:.3f}, p={p_group:.3f}")
+#         print("Print results")
+#         print(f"\n{feature}:")
+#         print(f"  Positive: {(valid_r > 0).sum()} | Negative: {(valid_r < 0).sum()}")
+#         print(f"  Mean r: {valid_r.mean():.3f} | Median r: {valid_r.median():.3f}")
+#         print(f"  Significant (p<0.05): {df_feature['significant'].sum()}")
+#         print(f"  t-test: t={t_stat:.3f}, p={p_group:.3f}")
 
 
 
@@ -228,7 +230,7 @@ for outcome_name, df_res in all_results.items():
     plt.show()
 
 # Scatter plot
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 fig.suptitle('FME vs Aitchison Stability (per participant)', fontsize=13)
 for ax, (lag_label, fme_col) in zip(axes, fme_versions.items()):
     valid = participant_df[[fme_col, 'aitchison_stability']].dropna()
@@ -238,18 +240,26 @@ for ax, (lag_label, fme_col) in zip(axes, fme_versions.items()):
     ax.set_xlabel(f'Mean FME ({lag_label})')
     ax.set_ylabel('Aitchison Stability')
     ax.set_title(f'{lag_label}\nr={r:.3f}, p={p:.3f}')
-    plt.tight_layout()
-    plt.savefig('scatter_fme_stability.png', dpi=150)
-    plt.show()
+plt.tight_layout()
+plt.savefig('scatter_fme_stability.png', dpi=150)
+plt.show()
 
 # Diff in fme graphs
-valid = df_merged[['fme_score_daily', 'fme_weighted']].dropna()
-
+valid = df_merged[['fme_score_daily', 'fme_weighted3', 'fme_weighted5']].dropna()
 plt.figure(figsize=(7, 7))
-plt.scatter(valid['fme_score_daily'], valid['fme_weighted'], 
-            color='steelblue', alpha=0.5, s=20)
-plt.plot([valid['fme_score_daily'].min(), valid['fme_score_daily'].max()],
-         [valid['fme_score_daily'].min(), valid['fme_score_daily'].max()],
+# scatter: daily vs weighted3
+plt.scatter(valid['fme_score_daily'], valid['fme_weighted3'],
+            color='steelblue', alpha=0.5, s=20, label='FME weighted-3')
+# scatter: daily vs weighted5
+plt.scatter(valid['fme_score_daily'], valid['fme_weighted5'],
+            color='darkorange', alpha=0.5, s=20, label='FME weighted-5')
+# scatter: weighted3 vs weighted5
+plt.scatter(valid['fme_weighted3'], valid['fme_weighted5'],
+            color='pink', alpha=0.5, s=20, label='FME weighted-5')
+# check x vs y
+min_val = valid['fme_score_daily'].min()
+max_val = valid['fme_score_daily'].max()
+plt.plot([min_val, max_val], [min_val, max_val],
          color='red', linestyle='--', label='y=x')
 plt.xlabel('FME same day')
 plt.ylabel('FME weighted lag')
@@ -259,27 +269,40 @@ plt.tight_layout()
 plt.savefig('scatter_fme_comparison.png', dpi=150)
 plt.show()
 
-# Diff in fme graphs in r
-daily_r = all_results['Aitchison daily (same day)'].set_index('participant_id')['spearman_r']
-weighted_r = all_results['Aitchison daily (weighted lag)'].set_index('participant_id')['spearman_r']
+# Diff in fme graphs in r - all 3 FME versions
+daily_r    = all_results['Aitchison daily (same day)'].set_index('participant_id')['spearman_r']
+weighted3_r = all_results['Aitchison daily (weighted lag3)'].set_index('participant_id')['spearman_r']
+weighted5_r = all_results['Aitchison daily (weighted lag5)'].set_index('participant_id')['spearman_r']
 
-compare = pd.DataFrame({'same_day': daily_r, 'weighted': weighted_r}).dropna()
+compare = pd.DataFrame({
+    'same day': daily_r,
+    'weighted lag3': weighted3_r,
+    'weighted lag5': weighted5_r
+}).dropna()
 
-plt.figure(figsize=(6, 6))
-plt.scatter(compare['same_day'], compare['weighted'], color='steelblue', alpha=0.7)
-plt.axhline(0, color='gray', linestyle='--', linewidth=0.8)
-plt.axvline(0, color='gray', linestyle='--', linewidth=0.8)
-plt.plot([-1, 1], [-1, 1], color='red', linestyle='--', label='y=x')
-plt.xlabel('Spearman r (same day FME)')
-plt.ylabel('Spearman r (weighted lag FME)')
-plt.title('Per-subject correlation: same day vs weighted lag')
-plt.legend()
+# 3 scatter plots: same_day vs lag3, same_day vs lag5, lag3 vs lag5
+pairs = [
+    ('same day', 'weighted lag3'),
+    ('same day', 'weighted lag5'),
+    ('weighted lag3', 'weighted lag5'),
+]
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+fig.suptitle('Per-subject Spearman r: FME version comparisons', fontsize=13)
+for ax, (x_col, y_col) in zip(axes, pairs):
+    ax.scatter(compare[x_col], compare[y_col], color='steelblue', alpha=0.7, s=40)
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.8)
+    ax.axvline(0, color='gray', linestyle='--', linewidth=0.8)
+    ax.plot([-1, 1], [-1, 1], color='red', linestyle='--', label='y=x')
+    ax.set_xlabel(f'Spearman r ({x_col})')
+    ax.set_ylabel(f'Spearman r ({y_col})')
+    ax.set_title(f'{x_col} vs {y_col}')
+    ax.legend(fontsize=8)
 plt.tight_layout()
 plt.savefig('scatter_r_comparison.png', dpi=150)
 plt.show()
 
 # HeatMap
-features_corr = ['fme_score_daily', 'fme_weighted', 'FIBE', 'KCAL', 'CARB', 'TFAT', 'Age', 'BMI', 'aitchison_day_dist', 'shannon_diversity']
+features_corr = ['fme_score_daily', 'fme_weighted3', 'fme_weighted5', 'FIBE', 'KCAL', 'CARB', 'TFAT', 'Age', 'BMI', 'aitchison_day_dist', 'shannon_diversity']
 
 corr_matrix = df_merged[features_corr].corr(method='spearman')
 
@@ -301,146 +324,137 @@ print("****Models****")
 # General models
 print("General models")
 # All features
-print(" All features")
-features = ['fme_score_daily', 'fme_weighted', 'FIBE', 'KCAL', 'CARB', 'TFAT', 'Age', 'BMI']
+print("General models")
+base_features = ['FIBE', 'KCAL', 'CARB', 'TFAT', 'Age', 'BMI']
 target = 'aitchison_day_dist'
-# Prepare the data
-df_model = df_merged[features + [target, 'participant_id']].dropna()
-X = df_model[features]
-y = df_model[target]
-groups = df_model['participant_id']
 
-# GroupKFold  so that the same participant is not in train and test
 gkf = GroupKFold(n_splits=5)
-# Try regression models
 models = {
-    'Linear Regression': 
-    Pipeline([('scaler', StandardScaler()),('model', LinearRegression())
-    ]),
-    'Ridge': 
-    Pipeline([('scaler', StandardScaler()),('model', Ridge())
-    ]),
-    'Random Forest':
-    Pipeline([('scaler', StandardScaler()),('model', RandomForestRegressor(n_estimators=100, random_state=42))
-    ])
+    'Linear Regression': Pipeline([('scaler', StandardScaler()), ('model', LinearRegression())]),
+    'Ridge':             Pipeline([('scaler', StandardScaler()), ('model', Ridge())]),
+    'Random Forest':     Pipeline([('scaler', StandardScaler()), ('model', RandomForestRegressor(n_estimators=100, random_state=42))])
 }
 
-print("Regression: Predict Aitchison Day Distance")
-print(f"Dataset: {len(df_model)} samples, {len(df_model['participant_id'].unique())} participants")
+# Iterate on each FME version
+for lag_label, fme_col in fme_versions.items():
+    features = [fme_col] + base_features
+    df_model = df_merged[features + [target, 'participant_id']].dropna()
+    X = df_model[features]
+    y = df_model[target]
+    groups = df_model['participant_id']
+    print(f"\nRegression: All features + {lag_label}")
+    print(f"Dataset: {len(df_model)} samples, {len(df_model['participant_id'].unique())} participants")
 
-#Iterate on models
-for model_name, pipeline in models.items():
-    #Using cross_val_score function to activate them
-    # Check r2 of the models
-    r2_scores = cross_val_score(pipeline, X, y, groups=groups, cv=gkf, scoring='r2')
-    # Check error of models
-    rmse_scores = cross_val_score(pipeline, X, y, groups=groups, cv=gkf, scoring='neg_root_mean_squared_error')
-    
-    print(f"\n[{model_name}]")
-    print(f"  Mean R²:   {r2_scores.mean():.3f} ± {r2_scores.std():.3f}")
-    print(f"  Mean RMSE: {(-rmse_scores).mean():.3f}")
+    # Iterate on models
+    for model_name, pipeline in models.items():
+        r2_scores   = cross_val_score(pipeline, X, y, groups=groups, cv=gkf, scoring='r2')
+        rmse_scores = cross_val_score(pipeline, X, y, groups=groups, cv=gkf, scoring='neg_root_mean_squared_error')
+        print(f"  [{model_name}] R²={r2_scores.mean():.3f} ± {r2_scores.std():.3f} | RMSE={(-rmse_scores).mean():.3f}")
 
 # Only fme model
 print(" Only FME")
-features_fme_only = ['fme_score_daily']
-# Prepare the data
-df_model_simple = df_merged[features_fme_only + [target, 'participant_id']].dropna()
-X_simple = df_model_simple[features_fme_only]
-y_simple = df_model_simple[target]
-groups_simple = df_model_simple['participant_id']
-models_simple = {
-    'Linear Regression': Pipeline([
-        ('scaler', StandardScaler()),
-        ('model', LinearRegression())
-    ]),
-    'Ridge': Pipeline([
-        ('scaler', StandardScaler()),
-        ('model', Ridge())
-    ])
-}
+# Check all versions of fme
+for lag_label, fme_col in fme_versions.items():
+    features_fme_only = [fme_col]
+    # Prepare the data
+    df_model_simple = df_merged[features_fme_only + [target, 'participant_id']].dropna()
+    X_simple = df_model_simple[features_fme_only]
+    y_simple = df_model_simple[target]
+    groups_simple = df_model_simple['participant_id']
+    models_simple = {
+        'Linear Regression': Pipeline([
+            ('scaler', StandardScaler()),
+            ('model', LinearRegression())
+        ]),
+        'Ridge': Pipeline([
+            ('scaler', StandardScaler()),
+            ('model', Ridge())
+        ])
+    }
 
-print("Regression: FME only to Aitchison Day Distance ")
-#Iterate on models
-for model_name, pipeline in models_simple.items():
-    # Check r2 of the models
-    r2_scores = cross_val_score(pipeline, X_simple, y_simple, groups=groups_simple, cv=gkf, scoring='r2')
-    # Check error of models
-    rmse_scores = cross_val_score(pipeline, X_simple, y_simple, groups=groups_simple, cv=gkf, scoring='neg_root_mean_squared_error')
-    print(f"\n[{model_name}]")
-    print(f"  Mean R²:   {r2_scores.mean():.3f} ± {r2_scores.std():.3f}")
-    print(f"  Mean RMSE: {(-rmse_scores).mean():.3f}")
+    print(f"Regression: {lag_label} FME only to Aitchison Day Distance")
+    #Iterate on models
+    for model_name, pipeline in models_simple.items():
+        # Check r2 of the models
+        r2_scores = cross_val_score(pipeline, X_simple, y_simple, groups=groups_simple, cv=gkf, scoring='r2')
+        # Check error of models
+        rmse_scores = cross_val_score(pipeline, X_simple, y_simple, groups=groups_simple, cv=gkf, scoring='neg_root_mean_squared_error')
+        print(f"\n[{model_name}]")
+        print(f"  Mean R²:   {r2_scores.mean():.3f} ± {r2_scores.std():.3f}")
+        print(f"  Mean RMSE: {(-rmse_scores).mean():.3f}")
 
 
 # Persenolized models
 print("Persenolized models")
 # All features
 print(" All features")
-features_personal = ['fme_score_daily', 'FIBE', 'KCAL', 'CARB', 'TFAT']
+base_features_personal = ['FIBE', 'KCAL', 'CARB', 'TFAT']
 target = 'aitchison_day_dist'
 personal_coefs = []
-# Iterate on subjects
-for subject, group in df_merged.groupby('participant_id'):
-    valid = group[features_personal + [target]].dropna()
-    if len(valid) < 5:
-        continue
-    X_sub = valid[features_personal]
-    y_sub = valid[target]
-    # activate model
-    model = LinearRegression()
-    model.fit(X_sub, y_sub)
+# Iterate on fme versions
+for lag_label, fme_col in fme_versions.items():
+    features_personal = [fme_col] + base_features_personal
+    personal_coefs = []
+    # Iterate on subjects
+    for subject, group in df_merged.groupby('participant_id'):
+        valid = group[features_personal + [target]].dropna()
+        if len(valid) < 5:
+            continue
+        X_sub = valid[features_personal]
+        y_sub = valid[target]
+        model = LinearRegression()
+        model.fit(X_sub, y_sub)
+        personal_coefs.append({
+            'participant_id': subject,
+            fme_col:         model.coef_[0],
+            'FIBE':          model.coef_[1],
+            'KCAL':          model.coef_[2],
+            'CARB':          model.coef_[3],
+            'TFAT':          model.coef_[4],
+        })
+    df_coefs = pd.DataFrame(personal_coefs)
+    print(f"\n ***{lag_label} ***")
+    for feature in features_personal:
+        t_stat, p_val         = stats.ttest_1samp(df_coefs[feature], 0)
+        wilcoxon_stat, wilcoxon_p = stats.wilcoxon(df_coefs[feature])
+        print(f"{feature}: mean={df_coefs[feature].mean():.4f} | "
+              f"pos={( df_coefs[feature] > 0).sum()} neg={(df_coefs[feature] < 0).sum()} | "
+              f"t-test p={p_val:.3f} | wilcoxon p={wilcoxon_p:.3f}")
 
-    personal_coefs.append({
-        'participant_id': subject,
-        'fme_score_daily':  model.coef_[0],
-        'FIBE':  model.coef_[1],
-        'KCAL':  model.coef_[2],
-        'CARB':  model.coef_[3],
-        'TFAT':  model.coef_[3],
-    })
 
-df_coefs = pd.DataFrame(personal_coefs)
-# Check stats on coefs
-for feature in features_personal:
-    print(feature)
-    t_stat, p_val = stats.ttest_1samp(df_coefs[feature], 0)
-    wilcoxon_stat, wilcoxon_p = stats.wilcoxon(df_coefs[feature])
-    print(f"Mean coefficient: {df_coefs[feature].mean():.4f}")
-    print(f"Positive: {(df_coefs[feature] > 0).sum()} | Negative: {(df_coefs[feature] < 0).sum()}")
-    print(f"t-test: t={t_stat:.3f}, p={p_val:.3f}")
-    print(f"Wilcoxon: stat={wilcoxon_stat:.3f}, p={wilcoxon_p:.3f}")
+
 
 # Only fme
 print(" Only fme")
-features_fme_only = ['fme_score_daily']
 target = 'aitchison_day_dist'
 personal_coefs = []
 # Prepare the data
 df_model_simple = df_merged[features_fme_only + [target, 'participant_id']].dropna()
 X_simple = df_model_simple[features_fme_only]
 y_simple = df_model_simple[target]
-# Iterate on subjects
-for subject, group in df_model_simple.groupby('participant_id'):
-    valid = group[features_fme_only + [target]].dropna()
-    if len(valid) < 5:
-        continue
-    X_sub = valid[features_fme_only]
-    y_sub = valid[target]
-    # activate model
-    model = LinearRegression()
-    model.fit(X_sub, y_sub)
+# Iterate on fme versions
+for lag_label, fme_col in fme_versions.items():
+    features_fme_only = [fme_col]
+    personal_coefs = []
+    df_model_simple = df_merged[features_fme_only + [target, 'participant_id']].dropna()
+    #Iterate on subjects
+    for subject, group in df_model_simple.groupby('participant_id'):
+        valid = group[features_fme_only + [target]].dropna()
+        if len(valid) < 5:
+            continue
+        X_sub = valid[features_fme_only]
+        y_sub = valid[target]
+        model = LinearRegression()
+        model.fit(X_sub, y_sub)
+        personal_coefs.append({
+            'participant_id': subject,
+            fme_col:          model.coef_[0],
+        })
 
-    personal_coefs.append({
-        'participant_id': subject,
-        'fme_score_daily':  model.coef_[0],
-    })
-
-df_coefs = pd.DataFrame(personal_coefs)
-# Check stats on coefs
-print("fme_score_daily")
-t_stat, p_val = stats.ttest_1samp(df_coefs["fme_score_daily"], 0)
-wilcoxon_stat, wilcoxon_p = stats.wilcoxon(df_coefs["fme_score_daily"])
-print(f"Mean coefficient: {df_coefs["fme_score_daily"].mean():.4f}")
-print(f"Positive: {(df_coefs["fme_score_daily"] > 0).sum()} | Negative: {(df_coefs["fme_score_daily"] < 0).sum()}")
-print(f"t-test: t={t_stat:.3f}, p={p_val:.3f}")
-print(f"Wilcoxon: stat={wilcoxon_stat:.3f}, p={wilcoxon_p:.3f}")
-
+    df_coefs = pd.DataFrame(personal_coefs)
+    print(f"\n**{lag_label} **")
+    t_stat, p_val             = stats.ttest_1samp(df_coefs[fme_col], 0)
+    wilcoxon_stat, wilcoxon_p = stats.wilcoxon(df_coefs[fme_col])
+    print(f"{fme_col}: mean={df_coefs[fme_col].mean():.4f} | "
+          f"pos={(df_coefs[fme_col] > 0).sum()} neg={(df_coefs[fme_col] < 0).sum()} | "
+          f"t-test p={p_val:.3f} | wilcoxon p={wilcoxon_p:.3f}")
