@@ -40,35 +40,6 @@ print(f"\nTarget distribution (High=1 / Low=0):")
 print(df_fme["High_Diversity_Class"].value_counts())
 
 #Features
-feature_cols = [
-    "fme_score_daily",
-    "fme_participant_mean",
-    "fme_within_person",
-    "fme_weighted_3day",
-    "KCAL",
-    "FIBE",
-    "CARB",
-    "TFAT",
-    "PROT",
-    "Age",
-    "BMI"
-]
-
-feature_cols_lagged = [
-    "fme_score_daily",
-    "fme_participant_mean",
-    "fme_within_person",
-    "fme_lag1",
-    "fme_lag2",
-    "KCAL",
-    "FIBE",
-    "CARB",
-    "TFAT",
-    "PROT",
-    "Age",
-    "BMI"
-]
-
 feature_cols_full_fme = [
     "fme_score_daily",
     "fme_participant_mean",
@@ -87,15 +58,14 @@ feature_cols_full_fme = [
 
 feature_cols_full_fme = [f for f in feature_cols_full_fme if f in df_fme.columns]
 
-feature_cols_lagged = [f for f in feature_cols_lagged if f in df_fme.columns]
-
-feature_cols = [f for f in feature_cols if f in df_fme.columns]
-
 #Drop rows with missing values in features or target
-df_fme_clean = df_fme[feature_cols + ["High_Diversity_Class", "participant_id"]].dropna()
+df_fme_clean = df_fme[feature_cols_full_fme + ["High_Diversity_Class", "participant_id"]].dropna()
+
+print(f"Full FME classification clean dataset: {df_fme_clean.shape[0]} samples")
+print(f"Participants after cleaning: {df_fme_clean['participant_id'].nunique()}")
 
 #Prepare data for modeling
-X = df_fme_clean[feature_cols]
+X = df_fme_clean[feature_cols_full_fme]
 print(X.columns.tolist())
 y = df_fme_clean['High_Diversity_Class']
 groups = df_fme_clean['participant_id']
@@ -131,8 +101,8 @@ for name, model in models.items():
         scaler = StandardScaler()
         # X_train_scaled = scaler.fit_transform(X_train)
         # X_test_scaled = scaler.transform(X_test)
-        X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=feature_cols)
-        X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=feature_cols)
+        X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=feature_cols_full_fme)
+        X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=feature_cols_full_fme)
         
         #Train
         #Clone model to avoid reusing fitted state between folds
@@ -186,7 +156,7 @@ else:
  
 if importances is not None:
     indices      = np.argsort(importances)[::-1]
-    feature_arr  = np.array(feature_cols)
+    feature_arr  = np.array(feature_cols_full_fme)
  
     plt.figure(figsize=(10, 6))
     sns.barplot(x=importances[indices], y=feature_arr[indices], hue=feature_arr[indices], palette="viridis", legend=False)
@@ -194,9 +164,9 @@ if importances is not None:
     plt.xlabel(xlabel, fontsize=12)
     plt.ylabel("Feature", fontsize=12)
     plt.tight_layout()
-    plt.savefig(DATA_DIR / "feature_importance.png", dpi=150)      #Save before showings
+    plt.savefig(DATA_DIR / "full_fme_feature_importance.png", dpi=150)      #Save before showings
     plt.show()
-    print(f"Plot saved: {DATA_DIR / 'feature_importance.png'}")
+    print(f"Plot saved: {DATA_DIR / 'full_fme_feature_importance.png'}")
 
 
 
@@ -204,15 +174,15 @@ if importances is not None:
 print("\n Regression: Predict Shannon Diversity")
 
 #Use the same features, but keep Shannon diversity as a continuous target
-df_reg_clean = df_fme[feature_cols + ["shannon_diversity", "participant_id"]].dropna()
+df_reg_clean = df_fme[feature_cols_full_fme + ["shannon_diversity", "participant_id"]].dropna()
 
 #Prepare regression data
-X_reg = df_reg_clean[feature_cols]
+X_reg = df_reg_clean[feature_cols_full_fme]
 y_reg = df_reg_clean["shannon_diversity"]
 groups_reg = df_reg_clean["participant_id"]
 
 print(f"Regression dataset: {df_reg_clean.shape[0]} samples")
-print(f"Features used: {feature_cols}")
+print(f"Features used: {feature_cols_full_fme}")
 print(f"Target mean Shannon diversity: {y_reg.mean():.3f}")
 print(f"Target std Shannon diversity:  {y_reg.std():.3f}")
 
@@ -309,7 +279,7 @@ print(f"\nBest Regression Model: {best_reg_model_name} (Mean R² = {best_reg_r2:
 
 # Save regression results table
 regression_results_df = pd.DataFrame(regression_results)
-regression_results_path = DATA_DIR / "regression_model_comparison.csv"
+regression_results_path = DATA_DIR / "full_fme_regression_model_comparison.csv"
 regression_results_df.to_csv(regression_results_path, index=False)
 print(f"Regression results saved: {regression_results_path}")
 
@@ -323,7 +293,7 @@ best_reg_model_obj.fit(X_reg_scaled, y_reg)
 #Feature importance for best regression model
 if best_reg_model_name == "Linear Regression" or best_reg_model_name == "Ridge Regression" :
     reg_importances = np.abs(best_reg_model_obj.coef_)
-    reg_title = "Feature Importance ("+best_reg_model_name+" — Absolute Coefficients)"
+    reg_title = "Feature Importance ("+best_reg_model_name+" - Absolute Coefficients)"
     reg_xlabel = "Absolute Coefficient Value"
 else:
     reg_importances = best_reg_model_obj.feature_importances_
@@ -331,7 +301,7 @@ else:
     reg_xlabel = "Importance Score"
 
 reg_indices = np.argsort(reg_importances)[::-1]
-feature_arr = np.array(feature_cols)
+feature_arr = np.array(feature_cols_full_fme)
 
 plt.figure(figsize=(10, 6))
 sns.barplot(
@@ -345,9 +315,9 @@ plt.title(reg_title, fontsize=14)
 plt.xlabel(reg_xlabel, fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "regression_feature_importance.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_regression_feature_importance.png", dpi=150)
 plt.show()
-print(f"Regression feature importance plot saved: {DATA_DIR / 'regression_feature_importance.png'}")
+print(f"Regression feature importance plot saved: {DATA_DIR / 'full_fme_regression_feature_importance.png'}")
 
 
 all_y_true = np.array(all_y_true_best)
@@ -365,9 +335,9 @@ plt.title(f"Predicted vs Actual Shannon Diversity ({best_reg_model_name})", font
 plt.xlabel("Actual Shannon Diversity", fontsize=12)
 plt.ylabel("Predicted Shannon Diversity", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "regression_predicted_vs_actual.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_regression_predicted_vs_actual.png", dpi=150)
 plt.show()
-print(f"Prediction plot saved: {DATA_DIR / 'regression_predicted_vs_actual.png'}")
+print(f"Prediction plot saved: {DATA_DIR / 'full_fme_regression_predicted_vs_actual.png'}")
 
 #Plot residuals
 residuals = all_y_true - all_y_pred
@@ -379,9 +349,9 @@ plt.title(f"Residual Plot ({best_reg_model_name})", fontsize=14)
 plt.xlabel("Predicted Shannon Diversity", fontsize=12)
 plt.ylabel("Residuals", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "regression_residuals.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_regression_residuals.png", dpi=150)
 plt.show()
-print(f"Residual plot saved: {DATA_DIR / 'regression_residuals.png'}")
+print(f"Residual plot saved: {DATA_DIR / 'full_fme_regression_residuals.png'}")
 
 #  Try model distance from avarge shanon instead of predict shanon
 # Calculate avg shanon score
@@ -393,15 +363,15 @@ df_fme['shannon_deviation'] = df_fme['shannon_diversity'] - df_fme['shannon_avg'
 print("\n Regression: predict continuous distance from avg Shannon diversity")
 
 #Use the same features, but keep Shannon diversity as a continuous target
-df_reg_dev_clean = df_fme[feature_cols + ["shannon_deviation", "participant_id"]].dropna()
+df_reg_dev_clean = df_fme[feature_cols_full_fme + ["shannon_deviation", "participant_id"]].dropna()
 
 #Prepare regression data
-X_dev_reg = df_reg_dev_clean[feature_cols]
+X_dev_reg = df_reg_dev_clean[feature_cols_full_fme]
 y_dev_reg = df_reg_dev_clean["shannon_deviation"]
 groups_dev_reg = df_reg_dev_clean["participant_id"]
 
 print(f"Regression dataset: {df_reg_dev_clean.shape[0]} samples")
-print(f"Features used: {feature_cols}")
+print(f"Features used: {feature_cols_full_fme}")
 print(f"Target mean Shannon deviation diversity: {y_dev_reg.mean():.3f}")
 print(f"Target std Shannon deviation diversity:  {y_dev_reg.std():.3f}")
 
@@ -496,9 +466,10 @@ for name, model in regression_dev_models.items():
 
 print(f"\nBest Regression Model: {best_dev_reg_model_name} (Mean R² = {best_dev_reg_r2:.3f})")
 
+
 #Save regression  deviation from avg results table
 regression_dev_results_df = pd.DataFrame(regression_dev_results)
-regression_dev_results_path = DATA_DIR / "regression_dev_model_comparison.csv"
+regression_dev_results_path = DATA_DIR / "full_fme_regression_dev_model_comparison.csv"
 regression_dev_results_df.to_csv(regression_dev_results_path, index=False)
 print(f"Regression results saved: {regression_dev_results_path}")
 
@@ -520,7 +491,7 @@ else:
     reg_dev_xlabel = "Importance Score"
 
 reg_dev_indices = np.argsort(reg_dev_importances)[::-1]
-feature_dev_arr = np.array(feature_cols)
+feature_dev_arr = np.array(feature_cols_full_fme)
 
 # Bar plot of distribution of Shannon Deviation from Personal Average
 plt.figure(figsize=(8, 5))
@@ -530,7 +501,7 @@ plt.title("Distribution of Shannon Deviation from Personal Average", fontsize=14
 plt.xlabel("Shannon Deviation", fontsize=12)
 plt.ylabel("Count", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "dev_shannon_deviation_distribution.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_dev_shannon_deviation_distribution.png", dpi=150)
 plt.show()
 
 # Bar plot of feature importance
@@ -546,7 +517,7 @@ plt.title(reg_dev_title, fontsize=14)
 plt.xlabel(reg_dev_xlabel, fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "dev_regression_feature_importance.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_dev_regression_feature_importance.png", dpi=150)
 plt.show()
 print(f"Regression feature importance plot saved: {DATA_DIR / 'dev_regression_feature_importance.png'}")
 
@@ -566,9 +537,9 @@ plt.title(f"Predicted vs Actual Shannon Deviation  ({best_dev_reg_model_name})",
 plt.xlabel("Actual Shannon Deviation", fontsize=12)
 plt.ylabel("Predicted Shannon Deviation", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "dev_regression_predicted_vs_actual.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_dev_regression_predicted_vs_actual.png", dpi=150)
 plt.show()
-print(f"Prediction plot saved: {DATA_DIR / 'dev_regression_predicted_vs_actual.png'}")
+print(f"Prediction plot saved: {DATA_DIR / 'full_fme_dev_regression_predicted_vs_actual.png'}")
 
 #Plot residuals
 dev_residuals = all_dev_y_true - all_dev_y_pred
@@ -580,6 +551,6 @@ plt.title(f"Residual Plot ({best_dev_reg_model_name})", fontsize=14)
 plt.xlabel("Predicted Shannon Deviation", fontsize=12)
 plt.ylabel("Residuals", fontsize=12)
 plt.tight_layout()
-plt.savefig(DATA_DIR / "dev_regression_residuals.png", dpi=150)
+plt.savefig(DATA_DIR / "full_fme_dev_regression_residuals.png", dpi=150)
 plt.show()
-print(f"Residual plot saved: {DATA_DIR / 'dev_regression_residuals.png'}")
+print(f"Residual plot saved: {DATA_DIR / 'full_fme_dev_regression_residuals.png'}")
