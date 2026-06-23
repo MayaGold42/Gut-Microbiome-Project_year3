@@ -117,7 +117,6 @@ print("\nModel Comparison Results:")
 best_model_name = ""
 best_auc = 0
 best_model_obj  = None
-classification_results = []
 
 for name, model in models.items():
     acc_scores = []
@@ -158,14 +157,6 @@ for name, model in models.items():
     print(f"Mean Accuracy: {mean_acc:.3f} ± {std_acc:.3f}")
     print(f"Mean ROC-AUC:  {mean_auc:.3f} ± {std_auc:.3f}")
     
-    classification_results.append({
-    "Model": name,
-    "Mean Accuracy": mean_acc,
-    "Std Accuracy": std_acc,
-    "Mean ROC-AUC": mean_auc,
-    "Std ROC-AUC": std_auc
-})
-    
     #Save best model based on AUC
     if mean_auc > best_auc:
         best_auc = mean_auc
@@ -173,81 +164,6 @@ for name, model in models.items():
         best_model_obj  = clone(model)
 
 print(f"\n Best Model: {best_model_name} (Mean AUC = {best_auc:.3f})")
-
-#Save and plot classification model comparison
-classification_results_df = pd.DataFrame(classification_results)
-
-classification_results_path = DATA_DIR / "classification_model_comparison.csv"
-classification_results_df.to_csv(classification_results_path, index=False)
-
-print(f"Classification results saved: {classification_results_path}")
-print(classification_results_df)
-
-#Plot Accuracy and ROC-AUC comparison
-plot_df = classification_results_df.copy()
-
-x = np.arange(len(plot_df["Model"]))
-width = 0.35
-
-plt.figure(figsize=(9, 5))
-
-plt.bar(
-    x - width / 2,
-    plot_df["Mean Accuracy"],
-    width,
-    label="Accuracy"
-)
-
-plt.bar(
-    x + width / 2,
-    plot_df["Mean ROC-AUC"],
-    width,
-    label="ROC-AUC"
-)
-
-plt.axhline(
-    y=0.5,
-    linestyle="--",
-    linewidth=1.5,
-    label="Random baseline"
-)
-
-plt.xticks(x, plot_df["Model"], rotation=20, ha="right")
-plt.ylabel("Score")
-min_score = plot_df[["Mean Accuracy", "Mean ROC-AUC"]].min().min()
-max_score = plot_df[["Mean Accuracy", "Mean ROC-AUC"]].max().max()
-
-plt.ylim(
-    max(0, min_score - 0.05),
-    min(1, max_score + 0.08)
-)
-plt.title("Classification Model Performance")
-plt.legend()
-
-for i, row in plot_df.iterrows():
-    plt.text(
-        i - width / 2,
-        row["Mean Accuracy"] + 0.005,
-        f"{row['Mean Accuracy']:.3f}",
-        ha="center",
-        va="bottom",
-        fontsize=9
-    )
-
-    plt.text(
-        i + width / 2,
-        row["Mean ROC-AUC"] + 0.005,
-        f"{row['Mean ROC-AUC']:.3f}",
-        ha="center",
-        va="bottom",
-        fontsize=9
-    )
-
-plt.tight_layout()
-plt.savefig(DATA_DIR / "classification_model_performance.png", dpi=300, bbox_inches="tight")
-plt.show()
-
-print(f"Classification performance plot saved: {DATA_DIR / 'classification_model_performance.png'}")
 
 #Refit best  model on the full clean regression dataset
 final_reg_scaler = StandardScaler()
